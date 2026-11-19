@@ -1,0 +1,23 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>КПД паротурбинной установки</title>
+<style>:root{--bg:#f5f7fa;--fg:#1d2733;--acc:#1f3a5f;--card:#fff}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5}
+header{background:var(--acc);color:#fff;padding:28px 16px}header h1{margin:0;font-size:1.8rem}
+main{max-width:1100px;margin:auto;padding:16px}img{max-width:100%;border-radius:6px;border:1px solid #d5dbe3}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+figure{margin:0;background:var(--card);padding:10px;border-radius:8px}figcaption{font-size:.9rem;margin-top:6px}
+table{border-collapse:collapse;background:#fff}td,th{border:1px solid #d5dbe3;padding:6px 10px;text-align:right}</style></head><body>
+<header><h1>Термический КПД паротурбинной установки</h1><div>От цикла Ренкина к реальной ТЭС · Сириус.Лето · партнёр — ЛГТУ</div></header>
+<main><h2>Что сделано</h2><p>Расчётная модель цикла Ренкина с регенерацией: свойства пара по стандарту IAPWS-IF97,
+9 вариантов начальных параметров (9/13/24 МПа × 540/560/600 °C), 0–3 регенеративных отбора с оптимальными давлениями,
+T–s диаграммы, тепловые схемы, Excel-книга с формулами и сравнение с реальным блоком К-300-240.</p>
+<h2>Демо (30 с)</h2><img src="img/demo.gif" alt="Демонстрация: калькулятор, диаграммы, сравнение вариантов, реальная ТЭС">
+<h2>Ключевые результаты, ηt, %</h2><table><tr><th>p₀, t₀</th><th>0 отб.</th><th>1</th><th>2</th><th>3</th></tr>
+<tr><td>9 МПа, 540 °C</td><td>42,73</td><td>45,72</td><td>46,94</td><td>47,61</td></tr>
+<tr><td>13 МПа, 560 °C</td><td>44,14</td><td>47,46</td><td>48,85</td><td>49,62</td></tr>
+<tr><td>24 МПа, 540 °C</td><td>45,26</td><td>49,21</td><td>51,02</td><td>52,04</td></tr></table>
+<p>Гипотеза «насыщения» регенерации подтверждена в 8 из 9 вариантов (исключение — 24 МПа / 540 °C: прирост 2→3 отбора 1,01 п. п.).</p>
+<h2>Скриншоты и графики</h2><div class="grid"><figure><img src="img/ui_calc.png" alt="Калькулятор: 13 МПа, 560 °C, 3 отбора → ηt = 49,6 %" loading="lazy"><figcaption>Калькулятор: 13 МПа, 560 °C, 3 отбора → ηt = 49,6 %</figcaption></figure><figure><img src="img/ts_regen3.png" alt="T–s диаграмма цикла с регенерацией" loading="lazy"><figcaption>T–s диаграмма цикла с регенерацией</figcaption></figure><figure><img src="img/scheme_3.png" alt="Принципиальная тепловая схема: 3 подогревателя" loading="lazy"><figcaption>Принципиальная тепловая схема: 3 подогревателя</figcaption></figure><figure><img src="img/ui_grid.png" alt="9 вариантов p₀ × t₀ и проверка гипотезы" loading="lazy"><figcaption>9 вариантов p₀ × t₀ и проверка гипотезы</figcaption></figure><figure><img src="img/regen_gain.png" alt="Насыщение прироста КПД от числа отборов" loading="lazy"><figcaption>Насыщение прироста КПД от числа отборов</figcaption></figure><figure><img src="img/ui_k300.png" alt="Реальная ТЭС: блок К-300-240" loading="lazy"><figcaption>Реальная ТЭС: блок К-300-240</figcaption></figure><figure><img src="img/k300_chain.png" alt="От идеального цикла 53,5 % к факту 46,1 %" loading="lazy"><figcaption>От идеального цикла 53,5 % к факту 46,1 %</figcaption></figure><figure><img src="img/ui_props.png" alt="Свойства пара по IAPWS-IF97" loading="lazy"><figcaption>Свойства пара по IAPWS-IF97</figcaption></figure></div>
+<h2>Как запустить интерактивную версию</h2><p>Калькулятору нужен локальный Python-сервер, поэтому здесь — витрина.
+Скачайте папку <code>rankine-kpd</code>, запустите <code>Запустить.bat</code> (или <code>python app/server.py</code>) — интерфейс откроется в браузере.</p>
+</main></body></html>
