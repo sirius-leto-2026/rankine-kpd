@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Термический КПД паротурбинной установки: цикл Ренкина</title>
+<meta name="description" content="Расчётная модель цикла Ренкина с регенерацией: 9 вариантов параметров пара, 0–3 отбора, T–s диаграммы, сравнение с блоком К-300-240 и калькулятор Карно.">
+<link rel="canonical" href="https://sirius-leto-2026.github.io/rankine-kpd/">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%231f3a5f'/%3E%3Ctext%20x='16'%20y='23'%20font-family='Arial,sans-serif'%20font-size='20'%20font-weight='700'%20fill='%23fff'%20text-anchor='middle'%3E%CE%B7%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="Сириус.Лето · rankine-kpd">
+<meta property="og:title" content="Термический КПД паротурбинной установки: цикл Ренкина">
+<meta property="og:description" content="Расчётная модель цикла Ренкина с регенерацией: 9 вариантов параметров пара, 0–3 отбора, T–s диаграммы, сравнение с блоком К-300-240 и калькулятор Карно.">
+<meta property="og:url" content="https://sirius-leto-2026.github.io/rankine-kpd/">
+<meta property="og:image" content="https://sirius-leto-2026.github.io/rankine-kpd/img/ui_calc.png">
+<meta property="og:image:width" content="1400">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="Скриншот калькулятора: 13 МПа, 560 °C, 3 отбора, ηt = 49,62 %">
+<style>
+:root{
+  --bg:#f5f7fa;--fg:#1d2733;--muted:#4a5866;
+  --acc:#1f3a5f;--acc-dark:#16294a;--orange:#b4530f;
+  --card:#fff;--line:#d5dbe3;--tint:#eef3f8;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:1rem;line-height:1.6;background:var(--bg);color:var(--fg)}
+img{display:block;max-width:100%;height:auto}
+a{color:#14507f;text-underline-offset:2px}
+a:hover{color:#0d3a5e}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:8px;top:-56px;z-index:100;background:#fff;color:var(--acc);padding:10px 14px;border-radius:8px;font-weight:600;text-decoration:none;transition:top .15s}
+.skip:focus{top:8px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+
+/* Шапка */
+.hero{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dark) 100%);color:#fff;padding:44px 0 36px}
+.eyebrow{margin:0 0 10px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:#c9dcf3}
+.hero h1{margin:0 0 14px;font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.18;letter-spacing:-.01em}
+.lead{margin:0 0 20px;max-width:64ch;font-size:clamp(1rem,2.2vw,1.12rem);color:#e8f0fa}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.facts li{padding:5px 12px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(255,255,255,.1);font-size:.85rem}
+.facts b{font-weight:700}
+.audience{margin:0;max-width:70ch;font-size:.95rem;color:#cfe0f5}
+
+/* Навигация по разделам */
+.toc{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.toc ul{display:flex;flex-wrap:wrap;gap:0 20px;max-width:1100px;margin:0 auto;padding:8px 16px;list-style:none}
+.toc a{display:inline-block;padding:4px 0;color:var(--acc);font-size:.9rem;font-weight:600;text-decoration:none;border-bottom:2px solid transparent}
+.toc a:hover{border-bottom-color:var(--orange);color:var(--acc)}
+@media (max-width:700px){.toc{position:static}}
+
+/* Общая сетка */
+main{padding-bottom:48px}
+section{margin-top:40px;scroll-margin-top:64px}
+h2{margin:0 0 8px;font-size:clamp(1.3rem,2.6vw,1.65rem);line-height:1.3;letter-spacing:-.01em;color:var(--acc)}
+h3{margin:0 0 6px;font-size:1.05rem;color:var(--acc)}
+p{margin:0 0 10px}
+p:last-child{margin-bottom:0}
+.sec-intro{margin:0 0 16px;max-width:75ch;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+
+/* О проекте */
+.about{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.about-list{margin:0;padding-left:18px}
+.about-list li+li{margin-top:6px}
+@media (max-width:760px){.about{grid-template-columns:1fr}}
+
+/* Таблица результатов */
+.table-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.results{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.results th,.results td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:center}
+.results thead th{background:var(--tint);color:var(--acc);font-size:.9rem;font-weight:600}
+.results thead th:first-child,.results tbody th{text-align:left}
+.results tbody th{background:#fbfcfe;font-weight:600;white-space:nowrap}
+.results tbody tr:last-child th,.results tbody tr:last-child td{border-bottom:0}
+.results tbody tr:nth-child(even) td{background:#fafcff}
+@media (max-width:620px){
+  .table-card{background:none;border:0;border-radius:0;overflow:visible}
+  .results,.results tbody,.results tr,.results th,.results td{display:block}
+  .results thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .results tbody tr{margin:0 0 10px;padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:8px}
+  .results tbody tr:last-child{margin-bottom:0}
+  .results tbody th{background:none;border:0;border-bottom:1px dashed var(--line);padding:0 0 6px;margin-bottom:6px;font-size:.95rem;white-space:normal}
+  .results tbody td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 0;text-align:right}
+  .results tbody td::before{content:attr(data-label);color:var(--muted);font-weight:400;text-align:left}
+  .results tbody tr:nth-child(even) td{background:none}
+}
+.callout{margin:14px 0 0;padding:12px 16px;background:#fff8f2;border-left:4px solid var(--orange);border-radius:0 8px 8px 0;color:#3d2a1c}
+.callout strong{color:#7a3a0c}
+
+/* Формулы */
+.formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px}
+.formula-card p:last-child{margin-bottom:0}
+.formula{margin:0 0 10px;padding:10px 14px;background:var(--tint);border-left:3px solid var(--acc);border-radius:0 6px 6px 0;font-size:1.05rem;font-weight:600;letter-spacing:.01em;overflow-wrap:anywhere}
+.formula sub{font-size:.72em}
+.formula-sub{margin:8px 0 0;font-size:.92rem;color:var(--muted);overflow-wrap:anywhere}
+.hint{margin:14px 0 0;font-size:.88rem;color:var(--muted)}
+
+/* Калькулятор */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.calc-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc label{display:block;font-size:.9rem;font-weight:600}
+.calc input{display:block;width:100%;margin-top:6px;padding:10px 12px;font:inherit;font-size:1rem;color:var(--fg);background:#fff;border:1px solid #9aa7b5;border-radius:8px}
+.calc input:hover{border-color:#6f8093}
+.calc input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(31,58,95,.18)}
+.calc input:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.calc input[aria-invalid="true"]{border-color:#a3261f;box-shadow:0 0 0 3px rgba(163,38,31,.15)}
+.calc-help{margin:10px 0 14px;font-size:.85rem;color:var(--muted)}
+.btn{display:inline-block;padding:11px 20px;font:inherit;font-size:1rem;font-weight:600;color:#fff;background:var(--acc);border:1px solid var(--acc);border-radius:8px;cursor:pointer}
+.btn:hover{background:var(--acc-dark);border-color:var(--acc-dark)}
+.btn:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.calc-result{padding:16px 18px;background:var(--tint);border:1px solid #c9d8e8;border-radius:10px}
+.calc-label{margin:0 0 2px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.calc-value{margin:0 0 12px;font-size:clamp(2.1rem,6vw,2.8rem);font-weight:700;line-height:1.1;color:var(--acc);font-variant-numeric:tabular-nums}
+.calc-pct{font-size:.55em;font-weight:600}
+.calc-formula{margin:0;padding:9px 11px;background:#fff;border:1px solid var(--line);border-radius:6px;font-size:.88rem;color:#33465c;white-space:pre-line;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.calc-error{margin:8px 0 0;font-size:.88rem;font-weight:600;color:#a3261f}
+.calc-warn{margin:14px 0 0;padding:12px 16px;background:#fff8f2;border-left:4px solid var(--orange);border-radius:0 8px 8px 0;font-size:.92rem;color:#3d2a1c}
+.calc-warn strong{color:#7a3a0c}
+@media (max-width:850px){.calc{grid-template-columns:1fr}}
+@media (max-width:520px){.calc-fields{grid-template-columns:1fr}}
+
+/* Демо и скриншоты */
+.demo{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin:0}
+.demo picture{display:block}
+.demo img{width:100%;border:1px solid var(--line);border-radius:6px}
+.demo figcaption{margin-top:8px;font-size:.9rem;color:var(--muted)}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
+.shot-card{margin:0;padding:10px;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.shot{display:block;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:zoom-in}
+.shot img{width:100%;transition:transform .2s ease}
+.shot:hover img{transform:scale(1.02)}
+.shot-card figcaption{margin-top:8px;font-size:.88rem;line-height:1.45;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.shot img{transition:none}.skip{transition:none}}
+
+/* Лайтбокс */
+dialog.lightbox{max-width:min(1100px,94vw);max-height:94vh;padding:12px;border:0;border-radius:12px;background:#0e1a2b;color:#fff;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+dialog.lightbox::backdrop{background:rgba(8,16,28,.82)}
+.lb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.lb-count{margin:0;font-size:.85rem;color:#b9cbe0}
+.lb-close{width:40px;height:40px;padding:0;font:inherit;font-size:1.5rem;line-height:1;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:8px;cursor:pointer}
+.lightbox img{max-width:100%;max-height:70vh;width:auto;margin:0 auto;background:#fff;border-radius:8px}
+.lb-cap{margin:10px 0 0;font-size:.92rem;line-height:1.45;color:#e6eef8;text-align:center}
+.lb-nav{display:flex;justify-content:space-between;gap:10px;margin-top:10px}
+.lb-nav button{font:inherit;font-size:.9rem;font-weight:600;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 14px;cursor:pointer}
+.lb-nav button:hover,.lb-close:hover{background:rgba(255,255,255,.22)}
+body.lb-open{overflow:hidden}
+
+/* Запуск */
+.steps{margin:0 0 12px;padding-left:22px}
+.steps li+li{margin-top:8px}
+code{padding:1px 5px;font-family:Consolas,"Courier New",monospace;font-size:.9em;background:var(--tint);border:1px solid var(--line);border-radius:4px;overflow-wrap:anywhere}
+.run-note{font-size:.9rem;color:var(--muted)}
+
+footer{margin-top:48px;padding:24px 0;background:#e9eff6;border-top:1px solid var(--line);font-size:.9rem;color:var(--muted)}
+footer p{margin:0 0 6px}
+footer p:last-child{margin-bottom:0}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к содержанию</a>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Сириус.Лето · партнёр — ЛГТУ</p>
+    <h1>Термический КПД паротурбинной установки</h1>
+    <p class="lead">Расчётная модель цикла Ренкина с регенерацией: как начальные параметры пара и число отборов влияют на термический КПД. 9 вариантов, T–s диаграммы, тепловые схемы и сравнение с реальным блоком К-300-240.</p>
+    <ul class="facts">
+      <li><b>9</b> вариантов параметров</li>
+      <li><b>0–3</b> регенеративных отбора</li>
+      <li>свойства пара по <b>IAPWS-IF97</b></li>
+      <li>сравнение с <b>К-300-240</b></li>
+    </ul>
+    <p class="audience">Для школьников и студентов, изучающих теплоэнергетику, и для экспертов, которым нужны результаты и проверка модели.</p>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Разделы страницы">
+  <ul>
+    <li><a href="#about">О проекте</a></li>
+    <li><a href="#results">Результаты</a></li>
+    <li><a href="#how">Как считается</a></li>
+    <li><a href="#calc">Калькулятор</a></li>
+    <li><a href="#shots">Скриншоты</a></li>
+    <li><a href="#run">Запуск</a></li>
+  </ul>
+</nav>
+
+<main id="main">
+  <div class="wrap">
+
+    <section id="about">
+      <h2>О проекте</h2>
+      <div class="about">
+        <div class="card">
+          <p>Модель считает термический КПД паротурбинной установки для 9 вариантов начальных параметров (9/13/24 МПа × 540/560/600 °C) и 0–3 регенеративных отборов с оптимальными давлениями. Свойства пара берутся по IAPWS-IF97.</p>
+          <p>Дополнительно строятся T–s диаграммы и принципиальные тепловые схемы, результаты собраны в Excel-книгу с формулами, а отдельный блок сравнивает модель с реальным энергоблоком К-300-240.</p>
+        </div>
+        <div class="card">
+          <h3>Кому и зачем</h3>
+          <p>Страница — для школьников и студентов, которые разбираются в цикле Ренкина, и для экспертов, которым нужны результаты и проверка модели.</p>
+          <ul class="about-list">
+            <li>как параметры пара и число отборов влияют на η<sub>t</sub>;</li>
+            <li>где заканчивается идеальный цикл и начинаются потери;</li>
+            <li>насколько модель близка к реальному блоку.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="results">
+      <h2>Ключевые результаты, η<sub>t</sub>, %</h2>
+      <p class="sec-intro">Термический КПД идеального цикла при p<sub>к</sub> = 4 кПа и оптимальных давлениях отборов. В таблице — три варианта из девяти; полный набор — на скриншоте «9 вариантов» ниже.</p>
+      <div class="table-card">
+        <table class="results">
+          <caption class="sr-only">Термический КПД идеального цикла для трёх вариантов начальных параметров и разного числа регенеративных отборов, %</caption>
+          <thead>
+            <tr>
+              <th scope="col">p<sub>0</sub>, t<sub>0</sub></th>
+              <th scope="col">0 отб.</th>
+              <th scope="col">1 отб.</th>
+              <th scope="col">2 отб.</th>
+              <th scope="col">3 отб.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">9 МПа, 540 °C</th>
+              <td data-label="0 отборов">42,73</td>
+              <td data-label="1 отбор">45,72</td>
+              <td data-label="2 отбора">46,94</td>
+              <td data-label="3 отбора">47,61</td>
+            </tr>
+            <tr>
+              <th scope="row">13 МПа, 560 °C</th>
+              <td data-label="0 отборов">44,14</td>
+              <td data-label="1 отбор">47,46</td>
+              <td data-label="2 отбора">48,85</td>
+              <td data-label="3 отбора">49,62</td>
+            </tr>
+            <tr>
+              <th scope="row">24 МПа, 540 °C</th>
+              <td data-label="0 отборов">45,26</td>
+              <td data-label="1 отбор">49,21</td>
+              <td data-label="2 отбора">51,02</td>
+              <td data-label="3 отбора">52,04</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="callout"><strong>Гипотеза «насыщения» регенерации</strong> подтверждена в 8 из 9 вариантов (исключение — 24 МПа / 540 °C: прирост 2→3 отбора 1,01 п. п.).</p>
+    </section>
+
+    <section id="how">
+      <h2>Как считается</h2>
+      <p class="sec-intro">Термический КПД — доля теплоты, подведённой в котле, которая превращается в полезную работу. В модели проекта свойства пара считаются по IAPWS-IF97, а потери учитываются через КПД турбины, насосов и котла.</p>
+      <div class="formula-grid">
+        <div class="card formula-card">
+          <h3>КПД цикла</h3>
+          <p class="formula">η<sub>t</sub> = l<sub>0</sub> / q<sub>1</sub> = (q<sub>1</sub> − q<sub>2</sub>) / q<sub>1</sub></p>
+          <p>q<sub>1</sub> — теплота, подведённая к рабочему телу в котле; q<sub>2</sub> — отведённая в конденсаторе; l<sub>0</sub> = q<sub>1</sub> − q<sub>2</sub> — полезная работа цикла.</p>
+          <p class="formula-sub">В энтальпиях: q<sub>1</sub> = h<sub>0</sub> − h<sub>пв</sub>, q<sub>2</sub> = h<sub>кт</sub> − h<sub>к</sub></p>
+        </div>
+        <div class="card formula-card">
+          <h3>Регенерация</h3>
+          <p>Часть пара отбирают из промежуточных ступеней турбины и направляют в подогреватели питательной воды. В котёл поступает уже нагретая вода — средняя температура подвода теплоты растёт, поэтому η<sub>t</sub> увеличивается.</p>
+          <p>Каждый следующий отбор добавляет меньше: прирост замедляется, то есть насыщается.</p>
+        </div>
+        <div class="card formula-card">
+          <h3>Предел Карно</h3>
+          <p class="formula">η<sub>Карно</sub> = 1 − T<sub>хол</sub> / T<sub>гор</sub></p>
+          <p>T — абсолютные температуры в кельвинах. Это КПД идеальной машины между горячим и холодным источником; для реального цикла он служит верхней оценкой.</p>
+        </div>
+      </div>
+      <p class="hint">Формулы — стандартные соотношения термодинамики. Числа проекта — в таблице выше и на скриншотах.</p>
+    </section>
+
+    <section id="calc">
+      <h2>Калькулятор: верхняя оценка идеального цикла</h2>
+      <p class="sec-intro">Введите температуру пара и температуру конденсации — страница посчитает КПД цикла Карно между ними. Это простая оценка сверху, а не модель проекта.</p>
+      <div class="calc">
+        <form id="carnot-form" novalidate>
+          <div class="calc-fields">
+            <label for="t-hot">Температура пара t<sub>0</sub>, °C
+              <input id="t-hot" name="t-hot" type="number" inputmode="decimal" step="1" min="1" max="800" value="560" required>
+            </label>
+            <label for="t-cold">Температура конденсации t<sub>к</sub>, °C
+              <input id="t-cold" name="t-cold" type="number" inputmode="decimal" step="1" min="1" max="200" value="30" required>
+            </label>
+          </div>
+          <p class="calc-help">Температуры переводятся в кельвины: T = t + 273,15.</p>
+          <button class="btn" type="submit">Посчитать КПД</button>
+        </form>
+        <div class="calc-result">
+          <p class="calc-label">КПД идеального цикла Карно</p>
+          <p class="calc-value" id="calc-out" aria-live="polite"><span id="calc-eta">63,6</span><span class="calc-pct"> %</span></p>
+          <p class="calc-formula" id="calc-formula">η = 1 − (30 + 273,15) / (560 + 273,15)
+= 1 − 303,15 / 833,15 = 0,6361 → 63,6 %</p>
+          <p class="calc-error" id="calc-error" role="alert" hidden></p>
+        </div>
+      </div>
+      <p class="calc-warn"><strong>Важно:</strong> это КПД идеального цикла Карно — верхняя оценка. Он не учитывает потери в турбине, насосах и котле, регенерацию и реальные свойства пара. Термический КПД модели проекта для 13 МПа, 560 °C и 3 отборов — 49,62 % (см. таблицу выше).</p>
+      <noscript><p class="hint">Для расчёта нужен JavaScript: η = 1 − (t<sub>к</sub> + 273,15) / (t<sub>0</sub> + 273,15).</p></noscript>
+    </section>
+
+    <section id="demo">
+      <h2>Демо (32 с)</h2>
+      <figure class="demo">
+        <picture>
+          <source srcset="img/demo.webp" type="image/webp">
+          <img src="img/demo.gif" alt="Слайд-демонстрация интерфейса: калькулятор цикла, T–s диаграмма, тепловая схема, график насыщения регенерации и цепочка КПД блока К-300-240" width="1200" height="860" loading="lazy" decoding="async">
+        </picture>
+        <figcaption>Слайд-демонстрация: калькулятор, T–s диаграмма, тепловая схема, насыщение прироста КПД и цепочка К-300-240.</figcaption>
+      </figure>
+    </section>
+
+    <section id="shots">
+      <h2>Скриншоты и графики</h2>
+      <p class="sec-intro">Нажмите на изображение, чтобы открыть его целиком. Листать можно стрелками ← →, закрыть — клавишей Esc.</p>
+      <div class="shots">
+        <figure class="shot-card">
+          <a class="shot" href="img/ui_calc.png" data-caption="Калькулятор: 13 МПа, 560 °C, 3 отбора → ηt = 49,62 %">
+            <img src="img/ui_calc.png" alt="Интерфейс калькулятора: параметры 13 МПа и 560 °C, 3 отбора, карточки КПД и T–s диаграмма" width="1400" height="1000" loading="lazy" decoding="async">
+          </a>
+          <figcaption>Калькулятор: 13 МПа, 560 °C, 3 отбора → η<sub>t</sub> = 49,62&nbsp;%</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/ts_regen3.png" data-caption="T–s диаграмма: 13 МПа, 560 °C, 3 отбора, pк = 4 кПа">
+            <img src="img/ts_regen3.png" alt="T–s диаграмма цикла 13 МПа и 560 °C с тремя отборами: идеальный цикл, регенеративный подогрев и линия с ηoi = 0,85" width="1125" height="750" loading="lazy" decoding="async">
+          </a>
+          <figcaption>T–s диаграмма: 13 МПа, 560 °C, 3 отбора, p<sub>к</sub> = 4&nbsp;кПа</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/scheme_3.png" data-caption="Принципиальная тепловая схема: 3 подогревателя (П1–П3) и конденсатор">
+            <img src="img/scheme_3.png" alt="Тепловая схема: котёл, турбина, генератор, конденсатор и три подогревателя П1–П3 с долями отбора" width="1650" height="930" loading="lazy" decoding="async">
+          </a>
+          <figcaption>Принципиальная тепловая схема: 3 подогревателя (П1–П3) и конденсатор</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/ui_grid.png" data-caption="9 вариантов p₀ × t₀ и проверка гипотезы насыщения">
+            <img src="img/ui_grid.png" alt="Таблица девяти вариантов начальных параметров и два графика: влияние t₀ и p₀, прирост КПД от числа отборов" width="1400" height="1000" loading="lazy" decoding="async">
+          </a>
+          <figcaption>9 вариантов p<sub>0</sub> × t<sub>0</sub> и проверка гипотезы насыщения</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/regen_gain.png" data-caption="Прирост КПД от числа отборов">
+            <img src="img/regen_gain.png" alt="График прироста КПД от числа отборов для шести сочетаний p₀ и t₀" width="1125" height="645" loading="lazy" decoding="async">
+          </a>
+          <figcaption>Прирост КПД от числа отборов</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/ui_k300.png" data-caption="Реальная ТЭС: блок К-300-240">
+            <img src="img/ui_k300.png" alt="Экран сравнения с К-300-240: фактические данные блока и цепочка КПД от 53,51 % до 46,09 %" width="1400" height="1000" loading="lazy" decoding="async">
+          </a>
+          <figcaption>Реальная ТЭС: блок К-300-240</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/k300_chain.png" data-caption="К-300-240: от идеального цикла 53,51 % к факту 46,09 %">
+            <img src="img/k300_chain.png" alt="Столбчатая диаграмма: идеальный цикл 53,51 %, турбина и насосы 48,14 %, механика и генератор 46,94 %, факт К-300 46,09 %" width="1200" height="645" loading="lazy" decoding="async">
+          </a>
+          <figcaption>К-300-240: от идеального цикла 53,51&nbsp;% к факту 46,09&nbsp;%</figcaption>
+        </figure>
+        <figure class="shot-card">
+          <a class="shot" href="img/ui_props.png" data-caption="Свойства пара по IAPWS-IF97">
+            <img src="img/ui_props.png" alt="Экран свойств воды и водяного пара по IAPWS-IF97 с полями давления и температуры" width="1400" height="1000" loading="lazy" decoding="async">
+          </a>
+          <figcaption>Свойства пара по IAPWS-IF97</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="run">
+      <h2>Как запустить интерактивную версию</h2>
+      <p class="sec-intro">На этой странице опубликованы результаты и скриншоты, а сам калькулятор — отдельное приложение на Python, которое работает локально и не требует интернета.</p>
+      <div class="card">
+        <p><strong>Важно:</strong> в опубликованном репозитории файлов приложения нет — здесь только витрина. Для локального запуска нужна папка проекта, в которой есть <code>app/server.py</code> и <code>Запустить.bat</code>; если её нет, интерактивную версию запустить не получится — результаты и скриншоты остаются на этой странице.</p>
+        <ol class="steps">
+          <li>Распакуйте папку проекта с приложением.</li>
+          <li>Установите Python 3, если его ещё нет.</li>
+          <li>Запустите <code>Запустить.bat</code> (Windows) или выполните <code>python app/server.py</code> в корне папки.</li>
+          <li>Откройте адрес, который сервер выведет в консоль, — интерфейс откроется в браузере.</li>
+        </ol>
+        <p class="run-note">Саму страницу и изображения можно скачать из репозитория <a href="https://github.com/sirius-leto-2026/rankine-kpd">github.com/sirius-leto-2026/rankine-kpd</a> (Code → Download ZIP или <code>git clone</code>); файлы приложения в него не входят. Все расчёты приложения выполняются локально: оно ничего не отправляет и не сохраняет cookie.</p>
+        <!-- Уточнить у команды ссылку на архив с приложением (app/server.py, Запустить.bat) -->
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<dialog class="lightbox" id="lightbox" aria-labelledby="lb-cap">
+  <div class="lb-head">
+    <p class="lb-count" id="lb-count"></p>
+    <button class="lb-close" type="button" aria-label="Закрыть">×</button>
+  </div>
+  <img id="lb-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="">
+  <p class="lb-cap" id="lb-cap"></p>
+  <div class="lb-nav">
+    <button type="button" id="lb-prev" aria-label="Предыдущее изображение">← Назад</button>
+    <button type="button" id="lb-next" aria-label="Следующее изображение">Вперёд →</button>
+  </div>
+</dialog>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Термический КПД паротурбинной установки</strong> — проект программы «Сириус.Лето», партнёр — ЛГТУ.</p>
+    <p>Страница статическая: расчёт калькулятора выполняется в браузере, данные никуда не отправляются. Исходники — <a href="https://github.com/sirius-leto-2026/rankine-kpd">rankine-kpd на GitHub</a>.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Калькулятор Карно: верхняя оценка идеального цикла */
+  var form = document.getElementById('carnot-form');
+  if (form) {
+    var hotInput = document.getElementById('t-hot');
+    var coldInput = document.getElementById('t-cold');
+    var etaEl = document.getElementById('calc-eta');
+    var formulaEl = document.getElementById('calc-formula');
+    var errorEl = document.getElementById('calc-error');
+    var KELVIN = 273.15;
+
+    function fmt(value, digits) {
+      return value.toLocaleString('ru-RU', {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function tempText(value) {
+      return Number.isInteger(value) ? String(value) : fmt(value, 1);
+    }
+
+    function setInvalid(el, invalid) {
+      if (invalid) {
+        el.setAttribute('aria-invalid', 'true');
+      } else {
+        el.removeAttribute('aria-invalid');
+      }
+    }
+
+    function update() {
+      var hot = parseFloat(hotInput.value);
+      var cold = parseFloat(coldInput.value);
+      var hotValid = isFinite(hot) && hot >= 1 && hot <= 800;
+      var coldValid = isFinite(cold) && cold >= 1 && cold <= 200;
+      var message = '';
+
+      if (!isFinite(hot) || !isFinite(cold)) {
+        message = 'Введите обе температуры числами.';
+      } else if (hot <= cold) {
+        message = 'Температура пара должна быть выше температуры конденсации.';
+      } else if (!hotValid || !coldValid) {
+        message = 'Проверьте диапазон: пар — от 1 до 800 °C, конденсация — от 1 до 200 °C.';
+      }
+
+      setInvalid(hotInput, !isFinite(hot) || (isFinite(hot) && hot <= cold) || !hotValid);
+      setInvalid(coldInput, !isFinite(cold) || (isFinite(hot) && hot <= cold) || !coldValid);
+
+      if (message) {
+        errorEl.textContent = message;
+        errorEl.hidden = false;
+        etaEl.textContent = '—';
+        formulaEl.textContent = 'Введите корректные температуры, чтобы увидеть подстановку.';
+        return;
+      }
+
+      var tCold = cold + KELVIN;
+      var tHot = hot + KELVIN;
+      var eta = 1 - tCold / tHot;
+      var percent = eta * 100;
+
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+      etaEl.textContent = fmt(percent, 1);
+      formulaEl.textContent =
+        'η = 1 − (' + tempText(cold) + ' + 273,15) / (' + tempText(hot) + ' + 273,15)\n' +
+        '= 1 − ' + fmt(tCold, 2) + ' / ' + fmt(tHot, 2) + ' = ' +
+        fmt(eta, 4) + ' → ' + fmt(percent, 1) + ' %';
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      update();
+    });
+    hotInput.addEventListener('input', update);
+    coldInput.addEventListener('input', update);
+
+    update();
+  }
+
+  /* Лайтбокс для скриншотов — без библиотек */
+  var dialog = document.getElementById('lightbox');
+  if (dialog && typeof dialog.showModal === 'function') {
+    var lbImg = document.getElementById('lb-img');
+    var lbCap = document.getElementById('lb-cap');
+    var lbCount = document.getElementById('lb-count');
+    var shots = Array.prototype.slice.call(document.querySelectorAll('a.shot'));
+    var current = 0;
+
+    function show(index) {
+      current = (index + shots.length) % shots.length;
+      var link = shots[current];
+      var img = link.querySelector('img');
+      lbImg.src = link.getAttribute('href');
+      lbImg.alt = img ? img.alt : '';
+      lbCap.textContent = link.getAttribute('data-caption') || (img ? img.alt : '');
+      lbCount.textContent = (current + 1) + ' из ' + shots.length;
+    }
+
+    shots.forEach(function (link, index) {
+      link.addEventListener('click', function (event) {
+        if (event.metaKey || event.ctrlKey || event.shiftKey) {
+          return;
+        }
+        event.preventDefault();
+        show(index);
+        dialog.showModal();
+        document.body.classList.add('lb-open');
+      });
+    });
+
+    dialog.addEventListener('close', function () {
+      document.body.classList.remove('lb-open');
+    });
+
+    dialog.addEventListener('click', function (event) {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
+
+    dialog.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        show(current + 1);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        show(current - 1);
+      }
+    });
+
+    document.getElementById('lb-prev').addEventListener('click', function () {
+      show(current - 1);
+    });
+    document.getElementById('lb-next').addEventListener('click', function () {
+      show(current + 1);
+    });
+    dialog.querySelector('.lb-close').addEventListener('click', function () {
+      dialog.close();
+    });
+  }
+})();
+</script>
+</body>
+</html>
